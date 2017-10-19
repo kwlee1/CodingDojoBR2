@@ -1,0 +1,77 @@
+<h1>Welcome, <%= current_user.first_name %>!</h1>
+<a href="/users/<%= current_user.id %>/edit">Edit My Profile</a> 
+<form class="" action="/sessions/<%= current_user.id %>" method="post">
+    <input type="hidden" name="authenticity_token" value="<% form_authenticity_token %>">
+    <input type="hidden" name="_method" value="delete">
+    <input type="submit" value="Logout">
+</form>
+<h2>Here are some of the events in your state: </h2>
+<table>
+    <th><tr><td>Name</td><td>Date</td><td>Location</td><td>Host</td><td>Action/Status</td></tr></th>
+    <% if @events_in_state %>
+        <% @events_in_state.each do |event| %>
+            <tr><td><a href="/events/<%= event.id %>"><%= event.name %></a></td>
+            <td><%= event.date %></td>
+            <td><%= event.city %></td>
+            <td><%= event.user.first_name %> <%= event.user.last_name %></td>
+            <% if current_user == event.user %>
+            <td> <a href="/events/<%= event.id %>/edit">Edit</a>  <form action="/events/<%= event.id %>" method="post">
+                <input type="hidden" name="authenticity_token" value="form_authenticity_token">
+                <input type="hidden" name="_method" value="delete">
+                <input type="submit" value="Delete">
+            </form></td>
+            <% elsif event.attendees_user.include?(current_user) %>
+            <td>Joining<form action="/events/<%= event.id %>/join" method="post">
+                <input type="hidden" name="authenticity_token" value="<% form_authenticity_token %>">
+                <input type="hidden" name="_method" value="delete">
+                <input type="submit" name="" value="Cancel"></form></td>
+            <% else %>
+            <td><a href="/events/<%= event.id %>/join">Join</a></td>
+            <% end %> 
+        </tr>
+        <% end %>
+    <% end %>
+</table>
+
+<h2>Here are some of the events outside your state: </h2>
+<table>
+    <th><tr><td>Name</td><td>Date</td><td>City</td><td>State</td><td>Host</td><td>Action</td></tr></th>
+    <% if @events_out %>
+        <% @events_out.each do |event| %> 
+        <tr><td><a href="/events/<%= event.id %>"><%= event.name %></a></td>
+            <td><%= event.date %></td>
+            <td><%= event.city %></td>
+            <td><%= event.state %></td>
+            <td><%= event.user.first_name %> <%= event.user.last_name %></td>
+            <% if current_user == event.user %>
+            <td><a href="/events/<%= event.id %>/edit">Edit</a><form action="/events/<%= event.id %>" method="post">
+                <input type="hidden" name="authenticity_token" value="form_authenticity_token">
+                <input type="hidden" name="_method" value="delete">
+                <input type="submit" value="Delete">
+            </form></td>
+            <% elsif event.attendees_user.include?(current_user) %>
+            <td>Joining <form action="/events/<%= event.id %>/join" method="post">
+                <input type="hidden" name="authenticity_token" value="<% form_authenticity_token %>">
+                <input type="hidden" name="_method" value="delete">
+                <input type="submit" name="" value="Cancel"></form></td>
+            <% else %>
+            <td><a href="/events/<%= event.id %>/join">Join</a></td>
+            <% end %> </tr>
+        <% end %>
+    <% end %>
+</table>
+
+<h2>Add Event</h2>
+<% if flash[:errors] %>
+    <% flash[:errors].each do |e| %>
+        <p><%= e %></p>
+    <% end %>
+<% end %>
+<form action="/events" method="post">
+    <input type="hidden" name="authenticity_token" value="<% form_authenticity_token %>">
+    Name: <input type="text" name="event[name]"><br>
+    Date: <input type="date" name="event[date]"><br>
+    City: <input type="text" name="event[city]"><br>
+    State: <input type="text" name="event[state]"><br>
+    <input type="submit" value="Add Event"><br>
+</form>

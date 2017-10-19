@@ -1,0 +1,40 @@
+<a href="/events">Event Dashboard</a> 
+<form class="" action="/sessions/<%= current_user.id %>" method="post">
+    <input type="hidden" name="authenticity_token" value="<% form_authenticity_token %>">
+    <input type="hidden" name="_method" value="delete">
+    <input type="submit" value="Logout">
+</form>
+<h1><%= @event.name %></h1>
+
+<h3>Host: <%= @event.user.first_name %> <%= @event.user.last_name %></h3>
+<h3>Date: <%= @event.date %></h3>
+<h3><%= @event.city %>, <%= @event.state %></h3>
+<h3>People who are joining the event: <%= @event.attendee.count(:user) %></h3>
+<table>
+    <th><tr><td>Name</td><td>Location</td><td>State</td></tr></th>
+    <% if @event.attendees_user %>
+        <% @event.attendees_user.each do |attendee| %>
+            <tr>
+                <td><%= attendee.first_name %> <%= attendee.last_name %></td>
+                <td><%= attendee.city %></td>
+                <td><%= attendee.state %></td>
+            </tr>
+        <% end %>
+    <% end %>
+</table>
+
+<h3>Discussion about this event: </h3>
+
+<h4>Add Comment: </h4>
+<form action="/comments" method="post">
+    <input type="hidden" name="authenticity_token" value="<% form_authenticity_token %>">
+    <input type="hidden" name="event_id" value="<%= @event.id %>">
+    <input type="textbox" name="content"><br>
+    <input type="submit" value="Submit Comments"><br>
+</form>
+
+<% if @comments %>
+    <% @comments.each do |comment| %>
+    <p> <%= comment.user.first_name %>  says: <%= comment.content %></p><p>----------------------</p>
+    <% end %>
+<% end %>
